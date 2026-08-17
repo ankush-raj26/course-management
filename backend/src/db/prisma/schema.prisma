@@ -1,0 +1,162 @@
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum  Roles {
+  USER 
+  ADMIN
+  INSTRUCTOR
+
+
+}
+enum courseStatus {
+  public 
+  private 
+}
+
+
+
+model User {
+  id  Int  @id @default(autoincrement())
+  name String
+  email String @unique 
+  role  Roles
+  course Course[]
+  isBlocked Boolean @default(false)
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAT DateTime @default(now())
+  reviews Review[]
+  QuizeAttemps QuizAttempt[]
+  progess Progress[]
+  enrollment Enrollment[]
+}
+
+
+model Course {
+  id Int @id @default(autoincrement())
+  instructorId Int? // foreign key 
+  categoryId Int 
+  title String
+  description String
+  status courseStatus
+  instructor User? @relation(fields: [instructorId] , references: [id])
+  category Category @relation(fields: [categoryId]   , references: [id])
+  sections Section[]
+  reviews Review[]
+  enrollment Enrollment[]
+  @@index([instructorId]) 
+  @@index([categoryId])  
+  @@index([status])       
+}
+
+model Section {
+  id Int @id  @default(autoincrement())
+  courseId Int 
+  title String
+  parentId Int? 
+  parent    Section?  @relation("ParentChildSections", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Section[] @relation("ParentChildSections")
+  order Int @default(autoincrement())
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lesson[] 
+  @@index([courseId]) 
+  @@index([parentId]) 
+}
+
+model Lesson {
+  id Int @id @default(autoincrement())
+  sectionId Int 
+  title String
+  contentUrl String
+  order Int @default(autoincrement())
+  isReq Boolean
+  section    Section @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress Progress[]
+  @@index([sectionId])
+
+}
+
+model Enrollment {
+  id Int @id @default(autoincrement())
+  studentId  Int 
+  courseId Int 
+  enrolledAt DateTime @default(now())
+ student User @relation(fields: [studentId], references: [id])
+ course  Course @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId , courseId])
+}
+
+model Progress {
+  id Int @id @default(autoincrement())
+  studentId Int 
+  lessonId Int 
+  completedAt DateTime @default(now())
+  @@unique([studentId , lessonId])
+  student User @relation(fields: [studentId] , references: [id])
+  lesson Lesson @relation(fields: [lessonId] , references: [id])
+
+}
+
+model  Quiz {
+  id Int @id @default(autoincrement())
+  courseId Int 
+  title String
+  passPercentage Int 
+  attemptLimit Int 
+  quizAttempts QuizAttempt[]
+  questions Question[]  
+
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+  quizId Int 
+  question String
+  options Json
+  correctAnswer Int
+  quiz Quiz @relation(fields: [quizId]  , references: [id] , onDelete: Cascade)
+
+
+}
+
+model QuizAttempt {
+  id Int @id @default(autoincrement())
+  studentId Int
+  quizId Int
+  score Int
+  passed Boolean
+  attemptNo Int @default(autoincrement())
+  student User @relation(fields: [studentId] , references: [id])
+  quiz    Quiz @relation(fields: [quizId]  , references: [id] , onDelete: Cascade)
+  @@index([studentId]) 
+  @@index([quizId])    
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  studentId Int 
+  courseId Int 
+  rating Int 
+  comment String?
+  student User @relation(fields: [studentId] , references: [id])
+  course Course @relation(fields: [courseId] , references: [id])
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  title String
+  courses Course[]
+
+}
+
+
+/// index of 2 things how that is managed and the relationhip 
