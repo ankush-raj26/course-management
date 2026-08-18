@@ -5,8 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc -b && node ./dist/index.js"
+    "test": "tsc -b && NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
+    "dev": "tsc -b && node ./dist/index.js",
+    "seed": "tsc -b && node ./dist/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,10 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "swagger-jsdoc": "^6.3.0"
