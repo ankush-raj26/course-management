@@ -7,13 +7,16 @@ const options = {
     info: {
       title: "Course App API",
       version: "1.0.0",
+      description: "Auth is a jwt kept in a httpOnly cookie called token.",
     },
 
-    servers: [
-      {
-        url: "http://localhost:3000",
+    servers: [{ url: "http://localhost:3000" }],
+
+    components: {
+      securitySchemes: {
+        cookieAuth: { type: "apiKey", in: "cookie", name: "token" },
       },
-    ],
+    },
   },
 
   apis: ["./src/routes/*.ts"],
