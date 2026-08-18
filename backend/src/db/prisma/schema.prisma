@@ -9,16 +9,17 @@ datasource db {
   provider = "postgresql"
 }
 
+
 enum  Roles {
-  USER 
+  STUDENT
   ADMIN
   INSTRUCTOR
 
 
 }
 enum courseStatus {
-  public 
-  private 
+  PUBLIC  
+  PRIVATE
 }
 
 
@@ -26,7 +27,8 @@ enum courseStatus {
 model User {
   id  Int  @id @default(autoincrement())
   name String
-  email String @unique 
+  email String 
+  password String 
   role  Roles
   course Course[]
   isBlocked Boolean @default(false)
@@ -37,17 +39,19 @@ model User {
   QuizeAttemps QuizAttempt[]
   progess Progress[]
   enrollment Enrollment[]
+  @@unique([email , role])    // so that same email can be used for the admin user and instructor can have student id too 
+
 }
 
 
 model Course {
   id Int @id @default(autoincrement())
-  instructorId Int? // foreign key 
+  instructorId Int // foreign key 
   categoryId Int 
   title String
   description String
-  status courseStatus
-  instructor User? @relation(fields: [instructorId] , references: [id])
+  status   courseStatus  @default(PRIVATE)
+  instructor User @relation(fields: [instructorId] , references: [id])
   category Category @relation(fields: [categoryId]   , references: [id])
   sections Section[]
   reviews Review[]
@@ -124,8 +128,6 @@ model Question {
   options Json
   correctAnswer Int
   quiz Quiz @relation(fields: [quizId]  , references: [id] , onDelete: Cascade)
-
-
 }
 
 model QuizAttempt {
@@ -158,5 +160,3 @@ model Category {
 
 }
 
-
-/// index of 2 things how that is managed and the relationhip 
