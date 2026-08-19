@@ -17,8 +17,8 @@ describe('course app routes', () => {
     const res = await request(app).post('/user/signup').send({
       name: 'Ankush',
       email: mail,
-      password: 'password123',
-      role: 'STUDENT',
+      password: 'password123'
+     
     });
 
     expect(res.status).toBe(200);
@@ -31,8 +31,7 @@ describe('course app routes', () => {
       .send({
         name: 'Ankush',
         email: 'small' + Date.now() + '@mail.com',
-        password: 'abc',
-        role: 'STUDENT',
+        password: 'abc'
       });
 
     // zod throws and the error handler catches it
@@ -45,7 +44,7 @@ describe('course app routes', () => {
       name: 'Ankush',
       email: 'notamail',
       password: 'password123',
-      role: 'STUDENT',
+    
     });
 
     expect(res.status).toBe(500);
@@ -56,8 +55,7 @@ describe('course app routes', () => {
     const res = await request(app).post('/instructor/signup').send({
       name: 'Ankush',
       email: mail,
-      password: 'password123',
-      role: 'INSTRUCTOR',
+      password: 'password123'
     });
 
     expect(res.status).toBe(200);

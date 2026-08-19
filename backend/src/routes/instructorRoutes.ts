@@ -6,7 +6,7 @@ import { instructorSignup } from '../controllers/instructor/instructorController
 import { userMiddleware } from '../auth/auth.middleware.js';
 import { rbac } from '../auth/rbac.js';
 import { asyncHandler } from '../lib/asynchandler.js';
-
+import { createQuiz } from '../controllers/instructor/instructorController.js';
 import { CourseProgess } from '../controllers/instructor/instructorController.js';
 import { quizResults } from '../controllers/instructor/instructorController.js';
 import { errorHandler } from '../lib/errorHandler.js';
@@ -37,8 +37,13 @@ instructorRouter.post('/signin', asyncHandler(instructorSignin));
 
 instructorRouter.use(userMiddleware);
 instructorRouter.use(rbac('INSTRUCTOR'));
-instructorRouter.use('/:userId/courseprogress', asyncHandler(CourseProgess));
-instructorRouter.use('/:quizId/quizResults', asyncHandler(quizResults));
+instructorRouter.get('/:userId/courseprogress', asyncHandler(CourseProgess));
+instructorRouter.get('/:quizId/quizResults', asyncHandler(quizResults));
+instructorRouter.post(
+  '/quiz',
+  rbac('INSTRUCTOR'),
+  asyncHandler(createQuiz),
+);
 
 // will the error handler triggered ?
 

@@ -109,7 +109,7 @@ export const CourseProgess = async function (req: UserRequest, res: Response): P
 
 export const quizResults = async function (req: UserRequest, res: Response): Promise<void> {
   const quizId = req.params.quizId;
-  if (quizId) {
+  if (!quizId) {
     return;
   }
   if (typeof quizId !== 'string') {
@@ -119,7 +119,7 @@ export const quizResults = async function (req: UserRequest, res: Response): Pro
     return;
   }
 
-  const results = prisma.quizAttempt.findMany({
+  const results = await  prisma.quizAttempt.findMany({
     where: { quizId: parseInt(quizId) },
   });
 

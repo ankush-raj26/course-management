@@ -5,13 +5,17 @@ import { prisma } from '../../index.js';
 import { courseType } from '../../lib/typeValidator/courseType.js';
 // this is public so comes before the auth  middlewares
 export const allCourses = async function (req: UserRequest, res: Response) {
-  const { skip } = req.body;
+ 
+  const skip = Number(req.query.skip ?? 0);
   // pagination .
   const courses = await prisma.course.findMany({
     where: {},
     skip: skip,
     take: 10,
     orderBy: { id: 'asc' },
+  });
+   res.status(200).json({
+    courses,
   });
 };
 
@@ -33,7 +37,7 @@ export const createCourse = async function (req: UserRequest, res: Response): Pr
     },
   });
 
-  res.status(200).json({ course: 'course created sucessfully', createCourse });
+  res.status(200).json({ course: 'course created sucessfully', createdCourse });
   return;
 };
 

@@ -8,7 +8,11 @@ import { errorHandler } from '../lib/errorHandler.js';
 import { rbac } from '../auth/rbac.js';
 import { CourseProgess } from '../controllers/student/studentController.js';
 import { quizResults } from '../controllers/student/studentController.js';
-
+import {enroll} from "../controllers/student/studentController.js"
+import { myCourses } from '../controllers/student/studentController.js';
+import { completeLesson } from '../controllers/student/studentController.js';
+import { submitQuiz } from '../controllers/student/studentController.js';
+import { submitRevieww } from '../controllers/student/studentController.js';
 /**
  * @openapi
  * /user/signup:
@@ -53,5 +57,37 @@ userRouter.use(userMiddleware);
  */
 userRouter.use('/:userId/courseprog', rbac('STUDENT'), asyncHandler(CourseProgess));
 userRouter.use('/quizresults', rbac('STUDENT', 'INSTRUCTOR'), asyncHandler(quizResults));
+
+userRouter.post(
+  '/courses/:courseId/enroll',
+  rbac('STUDENT'),
+  asyncHandler(enroll),
+);
+
+userRouter.get(
+  '/courses',
+  rbac('STUDENT'),
+  asyncHandler(myCourses),
+);
+
+userRouter.post(
+  '/lessons/:lessonId/complete',
+  rbac('STUDENT'),
+  asyncHandler(completeLesson),
+);
+
+userRouter.post(
+  '/quiz/submit',
+  rbac('STUDENT'),
+  asyncHandler(submitQuiz),
+);
+
+userRouter.post(
+  '/courses/:courseId/review',
+  rbac('STUDENT'),
+  asyncHandler(submitRevieww),
+);
+
+
 
 userRouter.use(errorHandler);

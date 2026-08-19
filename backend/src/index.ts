@@ -12,7 +12,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
 import { asyncHandler } from './lib/asynchandler.js';
-
+import { courseRouter } from './routes/courseRoutes.js';
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
 });
@@ -45,7 +45,7 @@ const logger = winston.createLogger({
 app.use('/user', userRouter);
 app.use('/instructor', instructorRouter);
 app.use('/admin', adminRouter);
-
+app.use('/course', courseRouter);
 const port = process.env.PORT || 3000;
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
