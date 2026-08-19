@@ -7,7 +7,11 @@
   "scripts": {
     "test": "tsc -b && NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
     "dev": "tsc -b && node ./dist/index.js",
-    "seed": "tsc -b && node ./dist/seed.js"
+    "seed": "tsc -b && node ./dist/seed.js",
+    "build" : "tsc -b ",
+    "start" : "node ./dist/index.js",
+    "lint": "eslint .",
+    "format": "prettier . --write"
   },
   "keywords": [],
   "author": "",
@@ -27,17 +31,22 @@
     "jsonwebtoken": "^9.0.3",
     "prisma": "^7.9.1",
     "swagger-ui-express": "^5.0.1",
-    "typescript": "^7.0.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
-    "jest": "^30.2.0",
-    "supertest": "^7.1.4",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
-    "swagger-jsdoc": "^6.3.0"
+    "eslint": "^10.8.1",
+    "jest": "^30.2.0",
+    "prettier": "^3.9.6",
+    "supertest": "^7.2.2",
+    "swagger-jsdoc": "^6.3.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0",
+    "winston": "^3.19.0"
   }
 }

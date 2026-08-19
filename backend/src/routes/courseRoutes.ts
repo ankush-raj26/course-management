@@ -1,13 +1,13 @@
-import express from "express";
+import express from 'express';
 export const courseRouter = express.Router();
-import { userMiddleware } from "../auth/auth.middleware.js";
-import { rbac } from "../auth/rbac.js";
-import type { Response } from "express";
-import { asyncHandler } from "../lib/asynchandler.js";
-import { allCourses } from "../controllers/course/course.controller.js";
-import { errorHandler } from "../lib/errorHandler.js";
-import { createCourse } from "../controllers/course/course.controller.js";
-import { publishCourse } from "../controllers/course/course.controller.js";
+import { userMiddleware } from '../auth/auth.middleware.js';
+import { rbac } from '../auth/rbac.js';
+import type { Response } from 'express';
+import { asyncHandler } from '../lib/asynchandler.js';
+import { allCourses } from '../controllers/course/course.controller.js';
+import { errorHandler } from '../lib/errorHandler.js';
+import { createCourse } from '../controllers/course/course.controller.js';
+import { publishCourse } from '../controllers/course/course.controller.js';
 
 /**
  * @openapi
@@ -19,8 +19,7 @@ import { publishCourse } from "../controllers/course/course.controller.js";
  *       200:
  *         description: one page of courses
  */
-courseRouter.get("/" ,asyncHandler(allCourses) );
-
+courseRouter.get('/', asyncHandler(allCourses));
 
 courseRouter.use(userMiddleware);
 
@@ -38,7 +37,7 @@ courseRouter.use(userMiddleware);
  *       403:
  *         description: you are not an instructor
  */
-courseRouter.post("/create" , rbac("INSTRUCTOR" ) , asyncHandler(createCourse));
+courseRouter.post('/create', rbac('INSTRUCTOR'), asyncHandler(createCourse));
 
 /**
  * @openapi
@@ -54,7 +53,6 @@ courseRouter.post("/create" , rbac("INSTRUCTOR" ) , asyncHandler(createCourse));
  *       403:
  *         description: not your course
  */
-courseRouter.put("/publish", rbac("ADMIN", "INSTRUCTOR"  ) , asyncHandler(publishCourse));
-
+courseRouter.put('/publish', rbac('ADMIN', 'INSTRUCTOR'), asyncHandler(publishCourse));
 
 courseRouter.use(errorHandler);

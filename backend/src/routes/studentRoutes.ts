@@ -1,13 +1,13 @@
-import express from "express"
+import express from 'express';
 export const userRouter = express.Router();
-import { studentSignin } from "../controllers/student/studentController.js";
-import { asyncHandler } from "../lib/asynchandler.js";
-import { studentSignup } from "../controllers/student/studentController.js";
-import { userMiddleware } from "../auth/auth.middleware.js";
-import { errorHandler } from "../lib/errorHandler.js";
-import { rbac } from "../auth/rbac.js";
-import { CourseProgess } from "../controllers/student/studentController.js";
-import { quizResults } from "../controllers/student/studentController.js";
+import { studentSignin } from '../controllers/student/studentController.js';
+import { asyncHandler } from '../lib/asynchandler.js';
+import { studentSignup } from '../controllers/student/studentController.js';
+import { userMiddleware } from '../auth/auth.middleware.js';
+import { errorHandler } from '../lib/errorHandler.js';
+import { rbac } from '../auth/rbac.js';
+import { CourseProgess } from '../controllers/student/studentController.js';
+import { quizResults } from '../controllers/student/studentController.js';
 
 /**
  * @openapi
@@ -21,7 +21,7 @@ import { quizResults } from "../controllers/student/studentController.js";
  *       400:
  *         description: zod said the body is wrong
  */
-userRouter.post("/signup"  ,asyncHandler(studentSignup));
+userRouter.post('/signup', asyncHandler(studentSignup));
 
 /**
  * @openapi
@@ -35,7 +35,7 @@ userRouter.post("/signup"  ,asyncHandler(studentSignup));
  *       400:
  *         description: wrong email or password
  */
-userRouter.post("/signin", asyncHandler(studentSignin));
+userRouter.post('/signin', asyncHandler(studentSignin));
 
 userRouter.use(userMiddleware);
 
@@ -51,17 +51,7 @@ userRouter.use(userMiddleware);
  *       200:
  *         description: progress report
  */
-userRouter.use("/:userId/courseprog",rbac("STUDENT" ),asyncHandler(CourseProgess));
-userRouter.use("/quizresults" , rbac("STUDENT","INSTRUCTOR" ) , asyncHandler(quizResults));
-
-
-
-
-
-
-
-
-
-
+userRouter.use('/:userId/courseprog', rbac('STUDENT'), asyncHandler(CourseProgess));
+userRouter.use('/quizresults', rbac('STUDENT', 'INSTRUCTOR'), asyncHandler(quizResults));
 
 userRouter.use(errorHandler);

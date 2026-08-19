@@ -1,7 +1,7 @@
-import "dotenv/config";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "./db/generated/prisma/client.js";
-import bcrypt from "bcrypt";
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from './db/generated/prisma/client.js';
+import bcrypt from 'bcrypt';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -20,27 +20,27 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.category.deleteMany();
 
-  const password = await bcrypt.hash("password123", 3);
+  const password = await bcrypt.hash('password123', 3);
 
   const category = await prisma.category.create({
-    data: { title: "Web Development" },
+    data: { title: 'Web Development' },
   });
 
   const instructor = await prisma.user.create({
     data: {
-      name: "Ankush",
-      email: "ankush@mail.com",
+      name: 'Ankush',
+      email: 'ankush@mail.com',
       password,
-      role: "INSTRUCTOR",
+      role: 'INSTRUCTOR',
     },
   });
 
   const student = await prisma.user.create({
     data: {
-      name: "Student 1",
-      email: "student1@mail.com",
+      name: 'Student 1',
+      email: 'student1@mail.com',
       password,
-      role: "STUDENT",
+      role: 'STUDENT',
     },
   });
 
@@ -49,11 +49,11 @@ async function main() {
   for (let i = 1; i <= 12; i++) {
     const course = await prisma.course.create({
       data: {
-        title: "Course " + i,
-        description: "This is the description of course " + i,
+        title: 'Course ' + i,
+        description: 'This is the description of course ' + i,
         instructorId: instructor.id,
         categoryId: category.id,
-        status: "PUBLIC",
+        status: 'PUBLIC',
       },
     });
     courses.push(course);
@@ -62,13 +62,13 @@ async function main() {
   const firstCourse = courses[0]!;
 
   const section = await prisma.section.create({
-    data: { title: "Getting started", courseId: firstCourse.id },
+    data: { title: 'Getting started', courseId: firstCourse.id },
   });
 
   await prisma.lesson.create({
     data: {
-      title: "What is node",
-      contentUrl: "https://youtube.com/watch?v=lesson1",
+      title: 'What is node',
+      contentUrl: 'https://youtube.com/watch?v=lesson1',
       sectionId: section.id,
       isReq: true,
     },
@@ -76,15 +76,15 @@ async function main() {
 
   await prisma.quiz.create({
     data: {
-      title: "Node basics quiz",
+      title: 'Node basics quiz',
       courseId: firstCourse.id,
       passPercentage: 60,
       attemptLimit: 3,
       questions: {
         create: [
           {
-            question: "What is Node.js ?",
-            options: ["JavaScript runtime", "Database", "Browser", "Language"],
+            question: 'What is Node.js ?',
+            options: ['JavaScript runtime', 'Database', 'Browser', 'Language'],
             correctAnswer: 0,
           },
         ],
@@ -96,7 +96,7 @@ async function main() {
     data: { studentId: student.id, courseId: firstCourse.id },
   });
 
-  console.log("seeding done");
+  console.log('seeding done');
 }
 
 main()

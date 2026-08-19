@@ -1,11 +1,5 @@
 # Course Management API
 
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![Node](https://img.shields.io/badge/Node-20+-339933?logo=nodedotjs&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)
-![Postgres](https://img.shields.io/badge/Postgres-16-4169E1?logo=postgresql&logoColor=white)
-![Zod](https://img.shields.io/badge/Zod-validation-3E67B1)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
 
 Backend for a small Udemy type app. Students enroll in courses, watch lessons, give quizes and leave reviews. Instructors create the courses and quizes. Admin sits on top and can publish or block stuff.
 
@@ -34,18 +28,7 @@ Everything is REST, JSON in JSON out, auth is a JWT kept in a httpOnly cookie.
 
 ## Running it
 
-```bash
-cd backend
-npm install
-cp .env.example .env      # fill in DATABASE_URL and the three jwt secrets
-npx prisma migrate dev
-npm run seed
-npm run dev
-```
 
-Server comes up on `http://localhost:3000`. Swagger UI is at `http://localhost:3000/api-docs`, health check is `GET /life`.
-
-### Docker
 
 ```bash
 docker compose up --build
@@ -58,19 +41,6 @@ docker build -t course-api ./backend
 docker run --env-file backend/.env -p 3000:3000 course-api
 ```
 
-### Env
-
-```
-DATABASE_URL=postgresql://user:pass@localhost:5432/course
-student_jwt_secret=...
-admin_jwt_secret=...
-instructor_jwt_secret=...
-```
-
-Three seperate secrets on purpose. A student token should not be verifiable by the admin middleware.
-
----
-
 ## Scripts
 
 | Command | Does |
@@ -78,7 +48,7 @@ Three seperate secrets on purpose. A student token should not be verifiable by t
 | `npm run dev` | build + run |
 | `npm run lint` | eslint over `src` |
 | `npm run seed` | fills the db with sample users, courses, lessons, quizes |
-| `npm test` | runs the route tests |
+| `npm  run test` | runs the route tests |
 
 ---
 
@@ -123,7 +93,7 @@ Sign in sets `token` as a httpOnly + sameSite=strict cookie. Nothing to store on
 
 ---
 
-## A few decisions worth explaining
+## A few decisions 
 
 **Why the email is not unique by itself.** It is `@@unique([email, role])`. Same person can be an instructor and also enroll as a student with the same mail id. Happens all the time on these platforms.
 
@@ -198,3 +168,5 @@ backend/
 - cursor pagination on the course list
 - rate limit on the signin routes
 - move the quiz scoring into a service, controller is getting fat
+- learn about how  companies detect piration and how they work with the drm 
+- how to create digital fingerprint of the video (if i get time 😁)
