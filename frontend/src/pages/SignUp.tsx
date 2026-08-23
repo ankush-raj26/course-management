@@ -40,7 +40,6 @@ export default function SignUp() {
         <Select label="I am a" value={role} onChange={(e) => setRole(e.target.value as Role)}>
           <option value="STUDENT">Student</option>
           <option value="INSTRUCTOR">Instructor</option>
-          <option value="ADMIN">Admin</option>
         </Select>
 
         <Input label="Name" required value={name} onChange={(e) => setName(e.target.value)} />

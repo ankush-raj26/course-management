@@ -43,6 +43,20 @@ export type Quiz = {
   questions: Question[];
 };
 
+export type Lesson = {
+  id: number;
+  title: string;
+  contentUrl: string;
+  isReq: boolean;
+};
+
+export type Section = {
+  id: number;
+  title: string;
+  lessons: Lesson[];
+  children: Section[];
+};
+
 export type Enrollment = {
   id: number;
   courseId: number;
@@ -68,6 +82,11 @@ export type QuizAttempt = {
   score: number;
   passed: boolean;
   attemptNo: number;
+  quiz: {
+    id: number;
+    title: string;
+    course: { id: number; title: string };
+  };
 };
 
 export type AdminUser = {

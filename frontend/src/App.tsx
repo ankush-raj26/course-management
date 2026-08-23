@@ -20,6 +20,7 @@ import QuizResults from './pages/student/QuizResults';
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
 import CreateCourse from './pages/instructor/CreateCourse';
 import CreateQuiz from './pages/instructor/CreateQuiz';
+import CourseContent from './pages/instructor/CourseContent';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 
@@ -90,6 +91,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
               <CreateQuiz />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/instructor/courses/:courseId/content"
+          element={
+            <ProtectedRoute allowedRoles={['INSTRUCTOR']}>
+              <CourseContent />
             </ProtectedRoute>
           }
         />
