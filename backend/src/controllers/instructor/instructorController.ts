@@ -62,7 +62,7 @@ export let instructorSignin = async function (req: Request, res: Response): Prom
   );
   res.cookie('token', token, {
     httpOnly: true, // js can't get it from the dom
-    secure: true,
+    secure: process.env.NODE_ENV === 'production', // only require https in prod, localhost/tests use plain http
     sameSite: 'strict', // protect's from the csrf
   });
 

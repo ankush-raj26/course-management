@@ -13,6 +13,7 @@ import { myCourses } from '../controllers/student/studentController.js';
 import { completeLesson } from '../controllers/student/studentController.js';
 import { submitQuiz } from '../controllers/student/studentController.js';
 import { submitRevieww } from '../controllers/student/studentController.js';
+import { rateLimiter } from '../lib/rateLimiter.js';
 /**
  * @openapi
  * /user/signup:
@@ -25,7 +26,7 @@ import { submitRevieww } from '../controllers/student/studentController.js';
  *       400:
  *         description: zod said the body is wrong
  */
-userRouter.post('/signup', asyncHandler(studentSignup));
+userRouter.post('/signup', rateLimiter, asyncHandler(studentSignup));
 
 /**
  * @openapi
@@ -39,7 +40,7 @@ userRouter.post('/signup', asyncHandler(studentSignup));
  *       400:
  *         description: wrong email or password
  */
-userRouter.post('/signin', asyncHandler(studentSignin));
+userRouter.post('/signin', rateLimiter, asyncHandler(studentSignin));
 
 userRouter.use(userMiddleware);
 

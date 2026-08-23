@@ -6,6 +6,7 @@ import { adminSignup } from '../controllers/admin/adminController.js';
 import { userMiddleware } from '../auth/auth.middleware.js';
 import { rbac } from '../auth/rbac.js';
 import { errorHandler } from '../lib/errorHandler.js';
+import { rateLimiter } from '../lib/rateLimiter.js';
 import { listUsers } from '../controllers/admin/adminController.js';
 import { blockUser } from '../controllers/admin/adminController.js';
 import { unblockUser } from '../controllers/admin/adminController.js';
@@ -16,8 +17,8 @@ import { createCategory } from '../controllers/admin/adminController.js';
 import { listCategory } from '../controllers/admin/adminController.js';
 
 // admin signup is open for now, have to close it later
-adminRouter.post('/signup', asyncHandler(adminSignup));
-adminRouter.post('/signin', asyncHandler(adminSignin));
+adminRouter.post('/signup', rateLimiter, asyncHandler(adminSignup));
+adminRouter.post('/signin', rateLimiter, asyncHandler(adminSignin));
 
 adminRouter.use(userMiddleware);
 adminRouter.use(rbac('ADMIN'));

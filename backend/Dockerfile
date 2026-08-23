@@ -7,4 +7,5 @@ RUN cd src/db/prisma && npx prisma generate
 RUN  npm run build
 
 
-CMD [ "npm" ,"run", "start" ]
+# apply migrations first, then start the server. without this the db has no tables on a fresh install
+CMD ["sh", "-c", "cd src/db && npx prisma migrate deploy && cd /app && npm run start"]
