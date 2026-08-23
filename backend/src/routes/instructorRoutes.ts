@@ -10,6 +10,7 @@ import { createQuiz } from '../controllers/instructor/instructorController.js';
 import { CourseProgess } from '../controllers/instructor/instructorController.js';
 import { quizResults } from '../controllers/instructor/instructorController.js';
 import { errorHandler } from '../lib/errorHandler.js';
+import { rateLimiter } from '../lib/rateLimiter.js';
 
 /**
  * @openapi
@@ -21,7 +22,7 @@ import { errorHandler } from '../lib/errorHandler.js';
  *       200:
  *         description: instructor created
  */
-instructorRouter.post('/signup', asyncHandler(instructorSignup));
+instructorRouter.post('/signup', rateLimiter, asyncHandler(instructorSignup));
 
 /**
  * @openapi
@@ -33,7 +34,7 @@ instructorRouter.post('/signup', asyncHandler(instructorSignup));
  *       200:
  *         description: signed in
  */
-instructorRouter.post('/signin', asyncHandler(instructorSignin));
+instructorRouter.post('/signin', rateLimiter, asyncHandler(instructorSignin));
 
 instructorRouter.use(userMiddleware);
 instructorRouter.use(rbac('INSTRUCTOR'));

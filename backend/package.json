@@ -8,8 +8,8 @@
     "test": "tsc -b && NODE_OPTIONS=--experimental-vm-modules jest --forceExit",
     "dev": "tsc -b && node ./dist/index.js",
     "seed": "tsc -b && node ./dist/seed.js",
-    "build" : "tsc -b ",
-    "start" : "node ./dist/index.js",
+    "build": "tsc -b ",
+    "start": "node ./dist/index.js",
     "lint": "eslint .",
     "format": "prettier . --write"
   },
@@ -36,6 +36,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/jest": "^30.0.0",
     "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",

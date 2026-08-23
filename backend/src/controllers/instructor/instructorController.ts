@@ -7,7 +7,8 @@ import type { Request, Response } from 'express';
 import type { UserRequest } from '../../types/express.js';
 import bcrypt from 'bcrypt';
 //import * as z from "zod";
-const student_jwt_secret: string = process.env.instructor_jwt_secret || 'jwt-secret-1';
+// using the same secret name everywhere so the login middleware can verify every role's token
+const student_jwt_secret: string = process.env.student_jwt_secret || 'jwt-secret-1';
 export let instructorSignup = async function (req: Request, res: Response): Promise<void> {
   const safe = signupType.safeParse(req.body);
 
@@ -38,7 +39,8 @@ export let instructorSignin = async function (req: Request, res: Response): Prom
   // find if username present
   const user = await prisma.user.findFirst({
     where: {
-      email: req.body.emaail,
+      email: req.body.email,
+      role: 'INSTRUCTOR',
     },
   });
 
@@ -60,7 +62,7 @@ export let instructorSignin = async function (req: Request, res: Response): Prom
   );
   res.cookie('token', token, {
     httpOnly: true, // js can't get it from the dom
-    secure: true,
+    secure: process.env.NODE_ENV === 'production', // only require https in prod, localhost/tests use plain http
     sameSite: 'strict', // protect's from the csrf
   });
 
@@ -163,4 +165,8 @@ export const createQuiz = async function (req: UserRequest, res: Response): Prom
       },
     },
   });
+
+  // was missing before, request just used to hang forever without this
+  res.status(200).json({ message: 'quiz created', quiz });
+  return;
 };
