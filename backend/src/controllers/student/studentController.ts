@@ -40,7 +40,8 @@ export let studentSignin = async function (req: Request, res: Response): Promise
   // find if username present
   const user = await prisma.user.findFirst({
     where: {
-      email: req.body.emaail,
+      email: req.body.email,
+      role: 'STUDENT',
     },
   });
 
@@ -109,7 +110,7 @@ export const CourseProgess = async function (req: UserRequest, res: Response): P
 export const quizResults = async function (req: UserRequest, res: Response): Promise<void> {
   if (!req.user?.id) throw new Error('user id not present');
 
-  const results = prisma.quizAttempt.findMany({
+  const results = await prisma.quizAttempt.findMany({
     where: { studentId: req.user?.id },
   });
 
@@ -151,6 +152,10 @@ export const myCourses = async function (req: UserRequest, res: Response): Promi
       course: true,
     },
   });
+
+  // was missing before, request just used to hang forever without this
+  res.status(200).json({ courses });
+  return;
 };
 
 export const completeLesson = async function (req: UserRequest, res: Response): Promise<void> {
@@ -252,12 +257,18 @@ export const submitQuiz = async function (req: UserRequest, res: Response): Prom
 };
 
 export const submitRevieww = async function (req: UserRequest, res: Response): Promise<void> {
-  const { courseId, comments, rating } = req.body;
+  // courseId comes from the url (/courses/:courseId/review), not the body
+  const { courseId } = req.params;
+  const { comments, rating } = req.body;
   if (!req.user?.id) return;
+  if (typeof courseId !== 'string') {
+    res.status(400).json({ message: 'invalid courseId' });
+    return;
+  }
   const review = await prisma.review.create({
     data: {
       studentId: req.user?.id,
-      courseId: courseId,
+      courseId: parseInt(courseId),
       comment: comments,
       rating: rating,
     },

@@ -55,8 +55,8 @@ userRouter.use(userMiddleware);
  *       200:
  *         description: progress report
  */
-userRouter.use('/:userId/courseprog', rbac('STUDENT'), asyncHandler(CourseProgess));
-userRouter.use('/quizresults', rbac('STUDENT', 'INSTRUCTOR'), asyncHandler(quizResults));
+userRouter.get('/:userId/courseprog', rbac('STUDENT'), asyncHandler(CourseProgess));
+userRouter.get('/quizresults', rbac('STUDENT', 'INSTRUCTOR'), asyncHandler(quizResults));
 
 userRouter.post(
   '/courses/:courseId/enroll',

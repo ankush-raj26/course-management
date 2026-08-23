@@ -8,6 +8,10 @@ import { allCourses } from '../controllers/course/course.controller.js';
 import { errorHandler } from '../lib/errorHandler.js';
 import { createCourse } from '../controllers/course/course.controller.js';
 import { publishCourse } from '../controllers/course/course.controller.js';
+import { getCourse } from '../controllers/course/course.controller.js';
+import { myCoursesInstructor } from '../controllers/course/course.controller.js';
+import { courseReviews } from '../controllers/course/course.controller.js';
+import { getQuiz } from '../controllers/course/course.controller.js';
 
 /**
  * @openapi
@@ -21,7 +25,65 @@ import { publishCourse } from '../controllers/course/course.controller.js';
  */
 courseRouter.get('/', asyncHandler(allCourses));
 
+/**
+ * @openapi
+ * /course/mine:
+ *   get:
+ *     tags: [Course]
+ *     summary: Courses the logged in instructor created, PRIVATE ones included
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: instructor's own courses
+ */
+// this needs to be registered before /:courseId, otherwise express would try to
+// read "mine" as a courseId
+courseRouter.get('/mine', userMiddleware, rbac('INSTRUCTOR'), asyncHandler(myCoursesInstructor));
+
+/**
+ * @openapi
+ * /course/{courseId}:
+ *   get:
+ *     tags: [Course]
+ *     summary: One course with its category and instructor name
+ *     responses:
+ *       200:
+ *         description: course details
+ *       404:
+ *         description: course not found
+ */
+courseRouter.get('/:courseId', asyncHandler(getCourse));
+
+/**
+ * @openapi
+ * /course/{courseId}/reviews:
+ *   get:
+ *     tags: [Course]
+ *     summary: Reviews left on a course
+ *     responses:
+ *       200:
+ *         description: list of reviews
+ */
+courseRouter.get('/:courseId/reviews', asyncHandler(courseReviews));
+
 courseRouter.use(userMiddleware);
+
+/**
+ * @openapi
+ * /course/{courseId}/quiz:
+ *   get:
+ *     tags: [Course]
+ *     summary: Quiz questions for a course, no correct answers included
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: quiz with questions
+ *       404:
+ *         description: no quiz yet
+ */
+courseRouter.get('/:courseId/quiz', rbac('STUDENT'), asyncHandler(getQuiz));
 
 /**
  * @openapi
