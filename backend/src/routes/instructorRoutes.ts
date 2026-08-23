@@ -9,6 +9,8 @@ import { asyncHandler } from '../lib/asynchandler.js';
 import { createQuiz } from '../controllers/instructor/instructorController.js';
 import { CourseProgess } from '../controllers/instructor/instructorController.js';
 import { quizResults } from '../controllers/instructor/instructorController.js';
+import { createSection } from '../controllers/instructor/instructorController.js';
+import { createLesson } from '../controllers/instructor/instructorController.js';
 import { errorHandler } from '../lib/errorHandler.js';
 import { rateLimiter } from '../lib/rateLimiter.js';
 
@@ -45,6 +47,34 @@ instructorRouter.post(
   rbac('INSTRUCTOR'),
   asyncHandler(createQuiz),
 );
+
+/**
+ * @openapi
+ * /instructor/sections:
+ *   post:
+ *     tags: [Instructor]
+ *     summary: Create a content folder for a course, optionally nested under another folder
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: folder created
+ */
+instructorRouter.post('/sections', rbac('INSTRUCTOR'), asyncHandler(createSection));
+
+/**
+ * @openapi
+ * /instructor/lessons:
+ *   post:
+ *     tags: [Instructor]
+ *     summary: Add a lecture (with its content url) inside a folder
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: lecture added
+ */
+instructorRouter.post('/lessons', rbac('INSTRUCTOR'), asyncHandler(createLesson));
 
 // will the error handler triggered ?
 

@@ -12,6 +12,7 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   // clean the old data first, order matters becuase of the foreign keys
   await prisma.enrollment.deleteMany();
+  await prisma.review.deleteMany();
   await prisma.question.deleteMany();
   await prisma.quiz.deleteMany();
   await prisma.lesson.deleteMany();
@@ -21,6 +22,16 @@ async function main() {
   await prisma.category.deleteMany();
 
   const password = await bcrypt.hash('password123', 3);
+
+  // signup as admin is not exposed in the UI, this is the only way to get an admin account
+  await prisma.user.create({
+    data: {
+      name: 'Admin',
+      email: 'admin@mail.com',
+      password,
+      role: 'ADMIN',
+    },
+  });
 
   const category = await prisma.category.create({
     data: { title: 'Web Development' },
@@ -61,16 +72,62 @@ async function main() {
 
   const firstCourse = courses[0]!;
 
-  const section = await prisma.section.create({
+  // folder structure: two sections, each with a couple of lessons
+  const gettingStarted = await prisma.section.create({
     data: { title: 'Getting started', courseId: firstCourse.id },
   });
 
   await prisma.lesson.create({
     data: {
       title: 'What is node',
-      contentUrl: 'https://youtube.com/watch?v=lesson1',
-      sectionId: section.id,
+      contentUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      sectionId: gettingStarted.id,
       isReq: true,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      title: 'Setting up your environment',
+      contentUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      sectionId: gettingStarted.id,
+      isReq: true,
+    },
+  });
+
+  const coreConcepts = await prisma.section.create({
+    data: { title: 'Core concepts', courseId: firstCourse.id },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      title: 'Modules and npm',
+      contentUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      sectionId: coreConcepts.id,
+      isReq: true,
+    },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      title: 'The event loop',
+      contentUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      sectionId: coreConcepts.id,
+      isReq: false,
+    },
+  });
+
+  // a subfolder nested inside "Core concepts", to show folders can nest more than one level deep
+  const advancedTopics = await prisma.section.create({
+    data: { title: 'Advanced topics', courseId: firstCourse.id, parentId: coreConcepts.id },
+  });
+
+  await prisma.lesson.create({
+    data: {
+      title: 'Streams and buffers',
+      contentUrl: 'https://www.youtube.com/watch?v=aqz-KE-bpKQ',
+      sectionId: advancedTopics.id,
+      isReq: false,
     },
   });
 
@@ -83,17 +140,33 @@ async function main() {
       questions: {
         create: [
           {
-            question: 'What is Node.js ?',
-            options: ['JavaScript runtime', 'Database', 'Browser', 'Language'],
+            question: 'What is the best way to fix a bug the night before a deadline?',
+            options: ['All of the above', 'Some of the above', 'Any of the above', 'None of the above'],
+            correctAnswer: 3,
+          },
+          {
+            question: 'Why did the deployment break right after someone said "it works on my machine"?',
+            options: ['All of the above', 'Some of the above', 'Any of the above', 'None of the above'],
             correctAnswer: 0,
+          },
+          {
+            question: "What's the real reason npm install takes forever?",
+            options: ['All of the above', 'Some of the above', 'Any of the above', 'None of the above'],
+            correctAnswer: 2,
+          },
+          {
+            question: 'Which excuse works best when the demo crashes in front of everyone?',
+            options: ['All of the above', 'Some of the above', 'Any of the above', 'None of the above'],
+            correctAnswer: 1,
+          },
+          {
+            question: 'What did the senior dev say after being asked to review a 3000 line pull request?',
+            options: ['All of the above', 'Some of the above', 'Any of the above', 'None of the above'],
+            correctAnswer: 3,
           },
         ],
       },
     },
-  });
-
-  await prisma.enrollment.create({
-    data: { studentId: student.id, courseId: firstCourse.id },
   });
 
   console.log('seeding done');

@@ -1,15 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { getCourse, getCourseReviews, publishCourse } from '../api/course';
-import { enrollInCourse, submitReview } from '../api/student';
+import { getCourse, getCourseReviews, getCourseSections, publishCourse } from '../api/course';
+import { enrollInCourse, getMyEnrolledCourses, submitReview } from '../api/student';
 import { userAtom } from '../store/userAtom';
-import type { Course, Review } from '../types';
+import type { Course, Review, Section } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import Textarea from '../components/ui/Textarea';
 import Select from '../components/ui/Select';
+import FolderTree from '../components/course/FolderTree';
 
 export default function CourseDetail() {
   const { courseId } = useParams();
@@ -17,6 +18,8 @@ export default function CourseDetail() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
+  const [isEnrolled, setIsEnrolled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
@@ -33,15 +36,29 @@ export default function CourseDetail() {
     const [c, r] = await Promise.all([getCourse(id), getCourseReviews(id)]);
     setCourse(c);
     setReviews(r);
+
+    if (user?.role === 'STUDENT') {
+      const enrollments = await getMyEnrolledCourses();
+      setIsEnrolled(enrollments.some((e) => e.courseId === id));
+    }
+
     setLoading(false);
   }
+
+  useEffect(() => {
+    if (!course) return;
+    if (course.instructorId === user?.id || isEnrolled) {
+      getCourseSections(course.id).then(setSections);
+    }
+  }, [course, isEnrolled, user]);
 
   async function handleEnroll() {
     if (!course) return;
     setMessage('');
     try {
       await enrollInCourse(course.id);
-      setMessage('enrolled! check your dashboard.');
+      setMessage('enrolled! scroll down to see the course content.');
+      setIsEnrolled(true);
     } catch (err: any) {
       setMessage(err?.response?.data?.message ?? 'could not enroll');
     }
@@ -87,8 +104,9 @@ export default function CourseDetail() {
 
       {message && <p className="mb-4 text-sm text-slate-700">{message}</p>}
 
-      <div className="mb-8 flex flex-wrap gap-2">
-        {user?.role === 'STUDENT' && <Button onClick={handleEnroll}>Enroll</Button>}
+      <div className="mb-8 flex flex-wrap items-center gap-2">
+        {user?.role === 'STUDENT' && !isEnrolled && <Button onClick={handleEnroll}>Enroll</Button>}
+        {user?.role === 'STUDENT' && isEnrolled && <Badge tone="green">Enrolled</Badge>}
 
         {isOwner && course.status === 'PRIVATE' && (
           <Button variant="outline" onClick={handlePublish}>
@@ -109,6 +127,18 @@ export default function CourseDetail() {
         )}
       </div>
 
+      {(isOwner || isEnrolled) && (
+        <div className="mb-8">
+          <h2 className="mb-3 text-lg font-medium text-slate-900">Course content</h2>
+
+          <FolderTree sections={sections} />
+        </div>
+      )}
+
+      {user?.role === 'STUDENT' && !isEnrolled && (
+        <p className="mb-8 text-sm text-slate-500">Enroll in this course to see its content.</p>
+      )}
+
       <h2 className="mb-3 text-lg font-medium text-slate-900">Reviews</h2>
 
       {reviews.length === 0 && <p className="mb-4 text-sm text-slate-500">No reviews yet.</p>}
@@ -124,7 +154,11 @@ export default function CourseDetail() {
         ))}
       </div>
 
-      {user?.role === 'STUDENT' && (
+      {user?.role === 'STUDENT' && !isEnrolled && (
+        <p className="mb-8 text-sm text-slate-500">Enroll in this course to leave a review.</p>
+      )}
+
+      {user?.role === 'STUDENT' && isEnrolled && (
         <form onSubmit={handleReview} className="flex flex-col gap-3">
           <h3 className="text-sm font-medium text-slate-900">Leave a review</h3>
           <Select

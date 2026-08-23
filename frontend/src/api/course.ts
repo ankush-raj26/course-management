@@ -1,5 +1,5 @@
 import { api } from './axios';
-import type { Course, Review, Quiz } from '../types';
+import type { Course, Review, Quiz, Section } from '../types';
 
 export async function getPublicCourses(skip = 0): Promise<Course[]> {
   const res = await api.get(`/course?skip=${skip}`);
@@ -40,4 +40,9 @@ export async function getCourseReviews(courseId: number): Promise<Review[]> {
 export async function getCourseQuiz(courseId: number): Promise<Quiz> {
   const res = await api.get(`/course/${courseId}/quiz`);
   return res.data.quiz;
+}
+
+export async function getCourseSections(courseId: number): Promise<Section[]> {
+  const res = await api.get(`/course/${courseId}/sections`);
+  return res.data.sections;
 }

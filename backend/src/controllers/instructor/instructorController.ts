@@ -170,3 +170,70 @@ export const createQuiz = async function (req: UserRequest, res: Response): Prom
   res.status(200).json({ message: 'quiz created', quiz });
   return;
 };
+
+// a "folder" in the course content tree. pass parentId to nest it inside another folder
+// (e.g. "Week 1" as the parent of "Frontend" / "Backend")
+export const createSection = async function (req: UserRequest, res: Response): Promise<void> {
+  const { courseId, title, parentId } = req.body;
+  if (!req.user?.id) return;
+  if (!courseId || !title) {
+    res.status(400).json({ message: 'courseId and title are required' });
+    return;
+  }
+
+  const course = await prisma.course.findFirst({ where: { id: courseId } });
+  if (!course) {
+    res.status(404).json({ message: 'course not found' });
+    return;
+  }
+  if (course.instructorId !== req.user.id) {
+    res.status(403).json({ message: "can't modify another instructor's course" });
+    return;
+  }
+
+  const section = await prisma.section.create({
+    data: {
+      courseId,
+      title,
+      parentId: parentId ?? null,
+    },
+  });
+
+  res.status(200).json({ message: 'folder created', section });
+  return;
+};
+
+// a lecture inside a folder, contentUrl is just a link to the video/slides/whatever
+export const createLesson = async function (req: UserRequest, res: Response): Promise<void> {
+  const { sectionId, title, contentUrl, isReq } = req.body;
+  if (!req.user?.id) return;
+  if (!sectionId || !title || !contentUrl) {
+    res.status(400).json({ message: 'sectionId, title and contentUrl are required' });
+    return;
+  }
+
+  const section = await prisma.section.findFirst({
+    where: { id: sectionId },
+    include: { course: true },
+  });
+  if (!section) {
+    res.status(404).json({ message: 'folder not found' });
+    return;
+  }
+  if (section.course.instructorId !== req.user.id) {
+    res.status(403).json({ message: "can't modify another instructor's course" });
+    return;
+  }
+
+  const lesson = await prisma.lesson.create({
+    data: {
+      sectionId,
+      title,
+      contentUrl,
+      isReq: isReq ?? true,
+    },
+  });
+
+  res.status(200).json({ message: 'lecture added', lesson });
+  return;
+};

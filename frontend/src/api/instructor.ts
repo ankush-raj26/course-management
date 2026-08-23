@@ -16,3 +16,18 @@ export async function createQuiz(data: {
   const res = await api.post('/instructor/quiz', data);
   return res.data;
 }
+
+export async function createSection(data: { courseId: number; title: string; parentId?: number }) {
+  const res = await api.post('/instructor/sections', data);
+  return res.data;
+}
+
+export async function createLesson(data: {
+  sectionId: number;
+  title: string;
+  contentUrl: string;
+  isReq: boolean;
+}) {
+  const res = await api.post('/instructor/lessons', data);
+  return res.data;
+}

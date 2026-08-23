@@ -80,12 +80,14 @@ userRouter.post(
 userRouter.post(
   '/quiz/submit',
   rbac('STUDENT'),
+  rateLimiter,
   asyncHandler(submitQuiz),
 );
 
 userRouter.post(
   '/courses/:courseId/review',
   rbac('STUDENT'),
+  rateLimiter,
   asyncHandler(submitRevieww),
 );
 

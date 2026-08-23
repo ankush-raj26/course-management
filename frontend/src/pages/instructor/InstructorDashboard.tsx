@@ -55,6 +55,11 @@ export default function InstructorDashboard() {
                   Publish
                 </Button>
               )}
+              <Link to={`/instructor/courses/${course.id}/content`}>
+                <Button size="sm" variant="outline">
+                  Content
+                </Button>
+              </Link>
               <Link to={`/instructor/courses/${course.id}/quiz`}>
                 <Button size="sm" variant="outline">
                   Quiz

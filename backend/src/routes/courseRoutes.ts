@@ -12,6 +12,7 @@ import { getCourse } from '../controllers/course/course.controller.js';
 import { myCoursesInstructor } from '../controllers/course/course.controller.js';
 import { courseReviews } from '../controllers/course/course.controller.js';
 import { getQuiz } from '../controllers/course/course.controller.js';
+import { getCourseSections } from '../controllers/course/course.controller.js';
 
 /**
  * @openapi
@@ -84,6 +85,20 @@ courseRouter.use(userMiddleware);
  *         description: no quiz yet
  */
 courseRouter.get('/:courseId/quiz', rbac('STUDENT'), asyncHandler(getQuiz));
+
+/**
+ * @openapi
+ * /course/{courseId}/sections:
+ *   get:
+ *     tags: [Course]
+ *     summary: Course content - sections and their lessons
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: list of sections with nested lessons
+ */
+courseRouter.get('/:courseId/sections', asyncHandler(getCourseSections));
 
 /**
  * @openapi

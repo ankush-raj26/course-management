@@ -24,7 +24,10 @@ export default function QuizResults() {
       <div className="flex flex-col gap-3">
         {results.map((attempt) => (
           <Card key={attempt.id} className="flex items-center justify-between">
-            <span className="text-sm text-slate-700">Attempt #{attempt.attemptNo}</span>
+            <div>
+              <p className="text-sm font-medium text-slate-900">{attempt.quiz.course.title}</p>
+              <span className="text-xs text-slate-500">Attempt #{attempt.attemptNo}</span>
+            </div>
             <span className="text-sm text-slate-700">Score: {attempt.score}</span>
             <Badge tone={attempt.passed ? 'green' : 'red'}>
               {attempt.passed ? 'Passed' : 'Failed'}

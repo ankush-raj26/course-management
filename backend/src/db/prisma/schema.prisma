@@ -56,6 +56,7 @@ model Course {
   sections Section[]
   reviews Review[]
   enrollment Enrollment[]
+  quizzes Quiz[]
   @@index([instructorId]) 
   @@index([categoryId])  
   @@index([status])       
@@ -112,13 +113,14 @@ model Progress {
 
 model  Quiz {
   id Int @id @default(autoincrement())
-  courseId Int 
+  courseId Int
   title String
-  passPercentage Int 
-  attemptLimit Int 
+  passPercentage Int
+  attemptLimit Int
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   quizAttempts QuizAttempt[]
-  questions Question[]  
-
+  questions Question[]
+  @@index([courseId])
 }
 
 model Question {
@@ -145,12 +147,13 @@ model QuizAttempt {
 
 model Review {
   id Int @id @default(autoincrement())
-  studentId Int 
-  courseId Int 
-  rating Int 
+  studentId Int
+  courseId Int
+  rating Int
   comment String?
   student User @relation(fields: [studentId] , references: [id])
   course Course @relation(fields: [courseId] , references: [id])
+  @@unique([studentId , courseId])
 }
 
 model Category {

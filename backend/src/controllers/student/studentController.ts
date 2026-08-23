@@ -112,6 +112,15 @@ export const quizResults = async function (req: UserRequest, res: Response): Pro
 
   const results = await prisma.quizAttempt.findMany({
     where: { studentId: req.user?.id },
+    include: {
+      quiz: {
+        select: {
+          id: true,
+          title: true,
+          course: { select: { id: true, title: true } },
+        },
+      },
+    },
   });
 
   res.status(200).json({ message: 'results creatd', results });
@@ -130,7 +139,21 @@ export const enroll = async function (req: UserRequest, res: Response): Promise<
     return;
   }
 
-  const enrolled = await prisma.enrollment.create({
+  const alreadyEnrolled = await prisma.enrollment.findUnique({
+    where: {
+      studentId_courseId: {
+        studentId: req.user.id,
+        courseId: parseInt(courseId),
+      },
+    },
+  });
+
+  if (alreadyEnrolled) {
+    res.status(400).json({ message: 'already enrolled in this course' });
+    return;
+  }
+
+  await prisma.enrollment.create({
     data: {
       courseId: parseInt(courseId),
       studentId: req.user?.id,
@@ -265,9 +288,35 @@ export const submitRevieww = async function (req: UserRequest, res: Response): P
     res.status(400).json({ message: 'invalid courseId' });
     return;
   }
-  const review = await prisma.review.create({
-    data: {
-      studentId: req.user?.id,
+
+  // only enrolled students can rate/review a course
+  const enrollment = await prisma.enrollment.findUnique({
+    where: {
+      studentId_courseId: {
+        studentId: req.user.id,
+        courseId: parseInt(courseId),
+      },
+    },
+  });
+  if (!enrollment) {
+    res.status(403).json({ message: 'enroll in this course before leaving a review' });
+    return;
+  }
+
+  // one review per student per course - resubmitting updates the existing review instead of duplicating it
+  const review = await prisma.review.upsert({
+    where: {
+      studentId_courseId: {
+        studentId: req.user.id,
+        courseId: parseInt(courseId),
+      },
+    },
+    update: {
+      comment: comments,
+      rating: rating,
+    },
+    create: {
+      studentId: req.user.id,
       courseId: parseInt(courseId),
       comment: comments,
       rating: rating,

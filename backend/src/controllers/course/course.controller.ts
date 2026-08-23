@@ -79,6 +79,42 @@ export const courseReviews = async function (req: UserRequest, res: Response): P
   return;
 };
 
+// course content (folder structure), returned as a tree so folders can be nested arbitrarily deep
+export const getCourseSections = async function (req: UserRequest, res: Response): Promise<void> {
+  const { courseId } = req.params;
+  if (typeof courseId !== 'string') {
+    res.status(400).json({ message: 'invalid courseId' });
+    return;
+  }
+
+  // sections come back flat (any nesting depth), the tree is assembled below since
+  // prisma's `include` can't recurse to an arbitrary depth on its own
+  const allSections = await prisma.section.findMany({
+    where: { courseId: parseInt(courseId) },
+    orderBy: { order: 'asc' },
+    include: {
+      lessons: { orderBy: { order: 'asc' } },
+    },
+  });
+
+  type SectionNode = (typeof allSections)[number] & { children: SectionNode[] };
+  const byId = new Map<number, SectionNode>();
+  allSections.forEach((section) => byId.set(section.id, { ...section, children: [] }));
+
+  const roots: SectionNode[] = [];
+  byId.forEach((section) => {
+    const parent = section.parentId ? byId.get(section.parentId) : undefined;
+    if (parent) {
+      parent.children.push(section);
+    } else {
+      roots.push(section);
+    }
+  });
+
+  res.status(200).json({ sections: roots });
+  return;
+};
+
 // quiz questions for a course, correctAnswer is left out so the student cant just read it off the response
 export const getQuiz = async function (req: UserRequest, res: Response): Promise<void> {
   const { courseId } = req.params;
